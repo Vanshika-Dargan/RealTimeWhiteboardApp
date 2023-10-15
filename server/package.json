@@ -1,0 +1,24 @@
+{
+  "name": "realtime-whiteboard-sharing-app-backend",
+  "version": "1.0.0",
+  "description": "Backend for realtime whiteboard sharing app",
+  "main": "dist/server.js",
+  "scripts": {
+    "start": "ts-node src/server.ts",
+    "dev": "nodemon -e ts src/server.ts",
+    "build": "tsc"
+  },
+  "author": "Vanshika Dargan",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.19",
+    "@types/node": "^20.8.6",
+    "@types/socket.io": "^3.0.2"
+  }
+}
