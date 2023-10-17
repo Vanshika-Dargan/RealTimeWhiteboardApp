@@ -1,33 +1,16 @@
 import {fabric} from 'fabric'
 import { FC, useEffect, useRef, useState } from 'react'
 import { Socket } from 'socket.io-client';
-
 interface Props{
   user:any,
-  socket:Socket
+  socket:Socket,
+  image:any,
+  setImage:any,
 }
-const Whiteboard:FC<Props>= ({user,socket}) => {
+const Whiteboard:FC<Props>= ({user,socket,image,setImage}) => {
   const [img,setImg]=useState<string>('');
-  useEffect(() => {
-    const handleWhiteboardDataResponse = (data) => {
-      setImg(data.imgURL);
-    };
   
-    socket.on('whiteboardDataResponse', handleWhiteboardDataResponse);
-  
-    // Cleanup function to unsubscribe from the socket event
-    return () => {
-      socket.off('whiteboardDataResponse', handleWhiteboardDataResponse);
-    };
-  }, [socket]);
 
-  if(!user?.presenter){
-    return (
-      <div>
-        <img src={img} alt="real time whiteboard image" className='h-100 w-100'/>
-      </div>
-    )
-  }
 const canvasRef=useRef<HTMLCanvasElement>(null);
 const [canvas,setCanvas]=useState<fabric.Canvas>();
 const [pencilWidth,setPencilWidth]=useState<number>(3);
@@ -37,7 +20,19 @@ const canvasBg=useRef('#FFFFFF')
 const [isDrawing,setIsDrawing]=useState(true);
 const [penColor,setPenColor]=useState('#000000');
 
-
+useEffect(() => {
+  
+  socket.on('whiteboardDataResponse', (data) => {
+    setImg(data.imgURL);
+  })
+},[]);
+if(!user?.presenter){
+  return (
+    <div>
+      <img src={img} alt="real time whiteboard image" className='h-100 w-100'/>
+    </div>
+  )
+}
 
 useEffect(()=>{
 
@@ -53,6 +48,7 @@ useEffect(()=>{
   }
 },[canvasRef])
 
+
 useEffect(()=>{
 if(!canvas) return;
 enableEventListeners();
@@ -61,12 +57,18 @@ return ()=>disableEventListeners();
 
 
 
+
 useEffect(()=>{
-if(!canvasRef.current) return;
-console.log(canvasRef.current.toDataURL())
-const canvasImage=canvasRef.current.toDataURL();
-socket.emit('whiteboardData',canvasImage);
-},[])
+  if(!canvas) return;
+  const canvasImage=canvas.toDataURL();
+  console.log(canvasImage);
+  setImage(canvasImage);
+  socket.emit('whiteboardData',canvasImage);
+  canvas.renderAll();
+},[canvasHistory.current])
+
+
+
 
 
 const changePencilWidth=(width:number)=>{
@@ -149,6 +151,7 @@ const exportBoard=()=>{
   link.href=`data:text/json;charset=utf-8,${encodeURIComponent(json)}`;
   link.click();
 }
+let loadedImageData:any=null;
 const loadBoard=()=>{
   if(!canvas) return;
   const input=document.createElement('input');
@@ -168,6 +171,7 @@ const loadBoard=()=>{
     };
     reader.readAsText(file);
   };
+  
   input.click();
 }
 const downloadBoard=()=>{
@@ -242,10 +246,10 @@ const toggleDrawingMode=()=>{
     value={pencilWidth}
     onChange={e=>changePencilWidth(parseInt(e.target.value))}
     />
-    <button onClick={handleUndo} disabled={canvasHistoryIndex<0}>
+    <button className='btn btn-primary mt-1' onClick={handleUndo} disabled={canvasHistoryIndex<0}>
       Undo
     </button>
-    <button onClick={handleRedo} disabled={canvasHistoryIndex===canvasHistory.current.length-1}>
+    <button className='btn btn-outline-primary mt-1' onClick={handleRedo} disabled={canvasHistoryIndex===canvasHistory.current.length-1}>
       Redo
     </button>
     <input

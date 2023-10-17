@@ -21,7 +21,7 @@ const JoinRoom:FC<Props> = ({uuid,socket,setUser}) => {
   }
   setUser(roomData);
   socket.emit('userJoin',roomData)
-  navigate('/${roomId}')
+  navigate(`/${roomId}`)
   }
   return (
     <form className="form col-md-12 mt-5">

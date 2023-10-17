@@ -20,8 +20,9 @@ const CreateRoom:FC<Props> = ({uuid,socket,setUser}) => {
     presenter:true
   }
   setUser(roomData);
-  socket.emit("userJoin",roomData)
   navigate(`/${roomId}`)
+  socket.emit("userJoin",roomData)
+  
   }
   return (
     <>

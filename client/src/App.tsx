@@ -5,32 +5,31 @@ import { v4 as uuidv4 } from 'uuid';
 import  io from "socket.io-client";
 import { useState,useEffect } from "react";
 
-
-const App = () => {
-  const server='http://localhost:5000';
+const server='http://localhost:8080';
 const connectionOptions={
-  "force new connection":true,
-  reConnectionAttempts:"Infinity",
-  timeout:10000,
-  transports:["websocket"]
+  "force new connection" : true,
+  "reconnectionAttempts": 10000,
+  "timeout" : 10000,
+  "transports" : ["websocket"]
 }
 const socket=io(server,connectionOptions)
+
+const App = () => {
+  
   const [user,setUser]=useState(null);
 
-socket.on('connect',()=>{
-  console.log("Connected successfully")
-})
+
+
 useEffect(()=>{
-socket.on("userJoin",(data)=>{
-  console.log(data)
+socket.on("userIsJoined",(data)=>{
   if(data.success){
-    console.log("User joined successfully")
+    console.log('User is Joined successfully')
   }
   else{
-    console.log("Not able to join user")
+    console.log('Something went wrong')
   }
 })
-},[socket])
+},[])
   const uuid=()=>{
     return uuidv4();
   }

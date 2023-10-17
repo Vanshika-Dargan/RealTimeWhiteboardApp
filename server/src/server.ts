@@ -12,12 +12,12 @@ app.get('/',(req,res)=>{
 })
 
 let roomIdGlobal,imgURLGlobal;
-io.on("connection",(socket)=>{
+io.on("connect",(socket)=>{
     socket.on("userJoin",(data)=>{
     const {room,roomId,userId,host,presenter}=data;
     roomIdGlobal=roomId;
     socket.join(roomId);
-    socket.emit("userJoin",{success:true})
+    socket.emit("userIsJoined",{success:true})
     socket.broadcast.to(roomId).emit("whiteboardDataResponse",{imgURL:imgURLGlobal})
     })
     socket.on('whiteboardData',(data)=>{
@@ -25,7 +25,7 @@ io.on("connection",(socket)=>{
     socket.broadcast.to(roomIdGlobal).emit("whiteboardDataResponse",{imgURL:data})
     })
 })
-const port: number = Number(process.env.PORT) || 5000;
+const port: number = Number(process.env.PORT) || 8080;
 server.listen(port, () => console.log(`Server running on port ${port}`));
 
 
